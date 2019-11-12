@@ -18,6 +18,7 @@ public class App
 
     public static void main( String[] args ) throws IOException {
         logger.warn("Current path: "+System.getProperty("user.dir") );
+        logger.warn("********* Start Processing **********");
 
         ArrayList<String> listFileName = new ArrayList<>();
         POIUtil.getAllFileName(ROOT_PATH,listFileName);

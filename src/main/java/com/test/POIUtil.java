@@ -1,6 +1,5 @@
 package com.test;
 
-import org.apache.poi.hssf.usermodel.HSSFCellStyle;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.Font;
@@ -57,10 +56,6 @@ public class POIUtil {
         FileInputStream fsIP= new FileInputStream(new File(filePath)); //Read the spreadsheet that needs to be updated
 
         XSSFWorkbook wb = new XSSFWorkbook(fsIP); //Access the workbook
-        if(fsIP == null){
-            logger.warn("Error: " + filePath + " get workbook error!!" );
-            return;
-        }
 
         //XSSFSheet worksheet = wb.getSheetAt(1); //Access the worksheet, so that we can update / modify it
         XSSFSheet worksheet = wb.getSheet(C_SHEET_TEST_RESULT);
@@ -164,7 +159,6 @@ public class POIUtil {
      */
     public static void getAllFileName(String path, ArrayList<String> listFileName){
         File file = new File(path);
-        //listFiles()方法存储的是文件的完整路径
         File [] files = file.listFiles();
         String [] names = file.list();
         if(names != null){
