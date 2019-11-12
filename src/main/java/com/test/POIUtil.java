@@ -160,8 +160,7 @@ public class POIUtil {
         XSSFCell cell; // declare a Cell object
         cell = worksheet.getRow(cslCell.getRow()).getCell(cslCell.getCol());
         if (cell == null) {
-            //logger.warn("Error>>>> updated "+ path + " failed!");
-            logger.warn("Row: " + cslCell.getRow() + " ,Col: " + cslCell.getCol() + " is null!");
+            logger.warn("Error>>>> updated "+ cslCell.getName() + " failed!");
         } else {
             //Version
             cell.setCellValue(cslCell.getValue());  // Get current cell value value and overwrite the value
