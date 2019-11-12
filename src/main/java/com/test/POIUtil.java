@@ -1,13 +1,7 @@
 package com.test;
 
-import org.apache.poi.ss.usermodel.BorderStyle;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.Font;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFCellStyle;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +11,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 
 public class POIUtil {
 
@@ -62,6 +57,20 @@ public class POIUtil {
         if(worksheet == null){
             logger.warn("Error: " + filePath + " test sheet not found" );
             return;
+        }
+
+        for(Iterator rowIterator=worksheet.iterator();rowIterator.hasNext();){
+            XSSFRow row = (XSSFRow) rowIterator.next();
+            logger.warn("Row>>>>>>>:" + (row.getRowNum()));
+            for (Iterator iterator=row.cellIterator();iterator.hasNext();){
+                XSSFCell cell=(XSSFCell) iterator.next();
+                if(cell.getCellType()==CellType.BLANK) {
+                    cell.setCellValue("");
+                }else{
+                    cell.setCellValue("");
+                }
+                logger.warn("Cell:"+ (cell.getColumnIndex())+ "-"+cell.getStringCellValue());
+            }
         }
         //create style
         XSSFCellStyle styleHeader = createStyle(wb);
@@ -127,7 +136,8 @@ public class POIUtil {
         XSSFCell cell; // declare a Cell object
         cell = worksheet.getRow(row).getCell(col);
         if(cell == null){
-            logger.warn("Error>>>> updated "+ path + " failed!");
+            //logger.warn("Error>>>> updated "+ path + " failed!");
+            logger.warn("Row: " + row + " ,Col: " + col + " is null!");
         }else{
             //Version
             cell.setCellValue(value);  // Get current cell value value and overwrite the value
