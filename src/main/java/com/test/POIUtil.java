@@ -1,5 +1,6 @@
 package com.test;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.*;
 import org.slf4j.Logger;
@@ -12,6 +13,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+
+import static org.apache.poi.ss.usermodel.Cell.*;
 
 public class POIUtil {
 
@@ -48,6 +51,7 @@ public class POIUtil {
 
     //Evidence skip line
     private static final int C_SKIP_LINE = 3;
+    private static final int C_SKIP_LINE2 = 10;
 
     /**
      * collect required cells
@@ -118,8 +122,14 @@ public class POIUtil {
             }
         }
 
-        //Clean up evidence
-        cleanUpEvidence(wb);
+        //clear evidence in test result sheet
+        clearTestResult(worksheet,C_SKIP_LINE2,4);
+
+        //Clean up evidence in evidence sheet
+        XSSFSheet evidenceSheet = wb.getSheet(C_SHEET_EVIDENCE);
+        if (evidenceSheet != null) {
+            clearTestResult(evidenceSheet,C_SKIP_LINE,2);
+        }
 
         fsIP.close(); //Close the InputStream
         FileOutputStream output_file = new FileOutputStream(new File(filePath));  //Open FileOutputStream to write updates
@@ -128,24 +138,45 @@ public class POIUtil {
         logger.warn("File: " + filePath + " updated successfully!");
     }
 
-    private static void cleanUpEvidence(XSSFWorkbook wb) {
-        XSSFSheet evidenceSheet = wb.getSheet(C_SHEET_EVIDENCE);
-        if (evidenceSheet != null) {
-            for (Iterator rowIterator = evidenceSheet.iterator(); rowIterator.hasNext(); ) {
-                XSSFRow row = (XSSFRow) rowIterator.next();
-                if (row.getRowNum() < C_SKIP_LINE) { //skip first 3 lines
-                    continue;
-                }
-                XSSFCell firstCol = row.getCell(0);
-                if (firstCol != null && firstCol.getCellType() != CellType.BLANK) {
-                    for (Iterator iterator = row.cellIterator(); iterator.hasNext(); ) {
-                        XSSFCell cell = (XSSFCell) iterator.next();
-                        if (cell.getColumnIndex() != 0) {
-                            cell.setCellValue("");
-                        }
+    /**
+     * clear range content
+     * @param sheet
+     * @param skipRow
+     * @param startCol
+     */
+    private static void clearTestResult(XSSFSheet sheet, int skipRow,int startCol) {
+        DataFormatter df = new DataFormatter();
+        boolean lv_need_clear;
+        //test result starts from F11
+        for (Iterator rowIterator = sheet.iterator(); rowIterator.hasNext(); ) {
+            XSSFRow row = (XSSFRow) rowIterator.next();
+            if (row.getRowNum() < skipRow) { //skip first 10 lines
+                continue;
+            }
+
+            logger.debug("Row:>>>>>" + row.getRowNum());
+            lv_need_clear = false;
+            for (Iterator iterator = row.cellIterator(); iterator.hasNext(); ) {
+                XSSFCell cell = (XSSFCell) iterator.next();
+                String str = df.formatCellValue(cell);
+                //Verify first column
+                if(cell.getColumnIndex() == 0){
+                    if(StringUtils.isNumeric(str)){
+                        lv_need_clear = true;
+                        continue;
+                    }else{
+                        break;
                     }
                 }
+
+                if(lv_need_clear && cell.getColumnIndex() > startCol){
+                    cell.setCellValue((String) null);
+                    cell.removeHyperlink();
+//                    cell.setCellType(CellType.BLANK);
+                    logger.debug("Cell cleared:->" + cell.getColumnIndex());
+                }
             }
+
         }
     }
 

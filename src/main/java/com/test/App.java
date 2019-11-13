@@ -17,7 +17,7 @@ public class App
     private static final String ROOT_PATH= System.getProperty("user.dir") + "\\in\\";
 
     public static void main( String[] args ) throws IOException {
-        logger.warn("Current path: " + ROOT_PATH);
+        logger.warn("Working path: " + ROOT_PATH);
         logger.warn("********* Start Processing **********");
 
         //get to be updated cell list
